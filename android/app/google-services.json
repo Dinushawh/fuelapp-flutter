@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "195328053625",
+    "project_id": "fuelapp-76dd0",
+    "storage_bucket": "fuelapp-76dd0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:195328053625:android:9cf55fe270a124086b9fa8",
+        "android_client_info": {
+          "package_name": "com.example.fuelapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_1-llJqeqcA86zlQr7AfEfyfxdYju43o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
