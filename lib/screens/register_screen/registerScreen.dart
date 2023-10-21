@@ -71,213 +71,216 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            children: <Widget>[
-              const TopContainer(),
-              Positioned(
-                top: 70,
-                left: 30,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Row(
-                    children: [
-                      Icon(
-                        Icons.arrow_back_ios,
-                        color: Colors.black,
-                        size: 20,
-                      ),
-                      Text(
-                        'Register',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 25, right: 25),
-            child: SizedBox(
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Create Account",
-                      style: TextStyle(
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(255, 1, 18, 33)),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 20),
-                      child: CustomTextFeild(
-                        controller: firstNameController,
-                        placeholder: "enter first name",
-                        titile: "First name",
-                        type: 'user',
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 20),
-                      child: CustomTextFeild(
-                        controller: lastNameController,
-                        placeholder: "enter last name",
-                        titile: "Last name",
-                        type: 'user',
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 20),
-                      child: CustomTextFeild(
-                        controller: emailController,
-                        placeholder: "Email",
-                        titile: "Email",
-                        type: 'email',
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 20),
-                      child: CustomTextFeild(
-                        controller: passwordController,
-                        placeholder: "enter password",
-                        titile: "Password",
-                        type: 'password',
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 20),
-                      child: CustomTextFeild(
-                        controller: confirmpasswordController,
-                        placeholder: "confirm password",
-                        titile: "Confirm password",
-                        type: 'password',
-                      ),
-                    ),
-                    Center(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 20),
-                        child: SizedBox(
-                          width: 300,
-                          height: 50,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  const Color.fromARGB(255, 243, 86, 33),
-                              padding: const EdgeInsets.symmetric(vertical: 15),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                            ),
-                            onPressed: () {
-                              if (firstNameController.text.isEmpty ||
-                                  lastNameController.text.isEmpty ||
-                                  emailController.text.isEmpty ||
-                                  passwordController.text.isEmpty ||
-                                  confirmpasswordController.text.isEmpty) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    backgroundColor: Colors.red,
-                                    content: Text('please fill all the field'),
-                                  ),
-                                );
-                              } else {
-                                controller.registerAccount(
-                                  emailController.text,
-                                  firstNameController.text,
-                                  lastNameController.text,
-                                  passwordController.text,
-                                  callBack,
-                                );
-                              }
-                            },
-                            child: Obx(
-                              () {
-                                return controller.isLoading.value
-                                    ? const Center(
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            SizedBox(
-                                              width: 20,
-                                              height: 20,
-                                              child: CircularProgressIndicator(
-                                                strokeWidth: 1.5,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding:
-                                                  EdgeInsets.only(left: 15),
-                                              child: Text(
-                                                'Loading...',
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontFamily:
-                                                      'Montserrat-Light',
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      )
-                                    : const Text(
-                                        'Register',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontFamily: 'Montserrat-Light',
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      );
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
+              children: <Widget>[
+                const TopContainer(),
+                Positioned(
+                  top: 70,
+                  left: 30,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Row(
                       children: [
-                        Center(
-                            child: Text(
-                          'Already have an account? ',
+                        Icon(
+                          Icons.arrow_back_ios,
+                          color: Colors.black,
+                          size: 20,
+                        ),
+                        Text(
+                          'Register',
                           style: TextStyle(
-                              fontFamily: 'Roboto-Light',
-                              fontSize: 18,
-                              color: Theme.of(context).colorScheme.onSurface),
-                        )),
-                        Center(
-                          child: InkWell(
-                            child: const Text(
-                              'Login',
-                              style: TextStyle(
-                                  fontSize: 18,
-                                  color: Color.fromARGB(255, 35, 28, 239),
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'Roboto-Bold'),
-                            ),
-                            onTap: () => {Navigator.pop(context)},
-                          ),
+                              fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
-                  ]),
+                  ),
+                ),
+              ],
             ),
-          )
-        ],
+            Padding(
+              padding: const EdgeInsets.only(left: 25, right: 25),
+              child: SizedBox(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Create Account",
+                        style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromARGB(255, 1, 18, 33)),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20),
+                        child: CustomTextFeild(
+                          controller: firstNameController,
+                          placeholder: "enter first name",
+                          titile: "First name",
+                          type: 'user',
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20),
+                        child: CustomTextFeild(
+                          controller: lastNameController,
+                          placeholder: "enter last name",
+                          titile: "Last name",
+                          type: 'user',
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20),
+                        child: CustomTextFeild(
+                          controller: emailController,
+                          placeholder: "Email",
+                          titile: "Email",
+                          type: 'email',
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20),
+                        child: CustomTextFeild(
+                          controller: passwordController,
+                          placeholder: "enter password",
+                          titile: "Password",
+                          type: 'password',
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20),
+                        child: CustomTextFeild(
+                          controller: confirmpasswordController,
+                          placeholder: "confirm password",
+                          titile: "Confirm password",
+                          type: 'password',
+                        ),
+                      ),
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 20),
+                          child: SizedBox(
+                            width: 300,
+                            height: 50,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    const Color.fromARGB(255, 243, 86, 33),
+                                padding: const EdgeInsets.symmetric(vertical: 15),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                              ),
+                              onPressed: () {
+                                if (firstNameController.text.isEmpty ||
+                                    lastNameController.text.isEmpty ||
+                                    emailController.text.isEmpty ||
+                                    passwordController.text.isEmpty ||
+                                    confirmpasswordController.text.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      backgroundColor: Colors.red,
+                                      content: Text('please fill all the field'),
+                                    ),
+                                  );
+                                } else {
+                                  controller.registerAccount(
+                                    emailController.text,
+                                    firstNameController.text,
+                                    lastNameController.text,
+                                    passwordController.text,
+                                    
+                                    callBack,
+                                  );
+                                }
+                              },
+                              child: Obx(
+                                () {
+                                  return controller.isLoading.value
+                                      ? const Center(
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              SizedBox(
+                                                width: 20,
+                                                height: 20,
+                                                child: CircularProgressIndicator(
+                                                  strokeWidth: 1.5,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    EdgeInsets.only(left: 15),
+                                                child: Text(
+                                                  'Loading...',
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontFamily:
+                                                        'Montserrat-Light',
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                      : const Text(
+                                          'Register',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontFamily: 'Montserrat-Light',
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        );
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Center(
+                              child: Text(
+                            'Already have an account? ',
+                            style: TextStyle(
+                                fontFamily: 'Roboto-Light',
+                                fontSize: 18,
+                                color: Theme.of(context).colorScheme.onSurface),
+                          )),
+                          Center(
+                            child: InkWell(
+                              child: const Text(
+                                'Login',
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    color: Color.fromARGB(255, 35, 28, 239),
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Roboto-Bold'),
+                              ),
+                              onTap: () => {Navigator.pop(context)},
+                            ),
+                          ),
+                        ],
+                      ),
+                    ]),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

@@ -19,7 +19,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.1.4 <4.0.0"
+  sdk: ">=3.0.6 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -47,6 +47,7 @@ dependencies:
   get_storage: ^2.1.1
   intl: ^0.18.1
   image_picker: ^1.0.4
+  like_button: ^2.0.5
 
 dev_dependencies:
   flutter_test:

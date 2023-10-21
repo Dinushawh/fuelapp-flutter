@@ -29,6 +29,7 @@ class userRegister extends GetxController {
         'firstname': firstname,
         'lastname': lname,
         'profilePicture': 'http://via.placeholder.com/350x150',
+        'points': 0,
         'date created': DateTime.now(),
       });
       callback('success');

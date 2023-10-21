@@ -38,6 +38,7 @@ class _CustomTextFeildState extends State<CustomTextFeild> {
           height: 5,
         ),
         TextFormField(
+          
           controller: widget.controller,
           keyboardType: widget.type == 'number'
               ? TextInputType.number
@@ -69,23 +70,15 @@ class _CustomTextFeildState extends State<CustomTextFeild> {
             filled: true,
             fillColor: Theme.of(context).colorScheme.surfaceVariant,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(100),
               borderSide: BorderSide.none,
             ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
-              borderSide: BorderSide(
-                color: MediaQuery.of(context).platformBrightness ==
-                        Brightness.light
-                    ? Colors.black
-                    : Colors.white,
-              ),
-            ),
+            
             hintText: widget.placeholder,
             hintStyle: const TextStyle(
                 color: Color.fromARGB(93, 46, 46, 46),
-                fontSize: 14,
-                fontFamily: 'Roboto-Light'),
+                fontSize: 16,
+                fontFamily: 'Poppins'),
             contentPadding:
                 const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
           ),

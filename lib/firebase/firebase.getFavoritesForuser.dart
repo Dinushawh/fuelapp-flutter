@@ -6,14 +6,14 @@ class GetFavouritesController extends GetxController {
   var isLoading = false.obs;
   final box = GetStorage();
 
-  Future<QuerySnapshot> getuserFav() {
+  Stream<QuerySnapshot> getuserFav() {
     return FirebaseFirestore.instance
         .collection('feedback')
         .where("email", isEqualTo: box.read('email'))
-        .get();
+        .snapshots();
   }
 
-  void deleteFav(id) {
-    FirebaseFirestore.instance.collection('feedback').doc(id).delete();
+  Future<void> deleteFav(String id) async {
+    await FirebaseFirestore.instance.collection('feedback').doc(id).delete();
   }
 }

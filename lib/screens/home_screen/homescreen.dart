@@ -17,6 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
         index: currentIndex,
         // ignore: prefer_const_constructors
         children: [Container(), Container(), Container(), ProfileScreen()],
+        
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
@@ -25,25 +26,25 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(
               Icons.home,
             ),
-            label: 'Home',
+            label: '',
           ),
           BottomNavigationBarItem(
             icon: Icon(
               Icons.map,
             ),
-            label: 'Map',
+            label: '',
           ),
           BottomNavigationBarItem(
             icon: Icon(
               Icons.info,
             ),
-            label: 'Info',
+            label: '',
           ),
           BottomNavigationBarItem(
             icon: Icon(
               Icons.person,
             ),
-            label: 'Profile',
+            label: '',
           ),
         ],
         selectedItemColor: Colors.deepOrange,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:fuelapp/screens/home_screen/homescreen.dart';
+import 'package:fuelapp/screens/profile_screen/profileScreen.dart';
 import 'package:fuelapp/widgets/top_image.dart';
 
 class FeedbackStep3 extends StatefulWidget {
@@ -38,7 +38,7 @@ class _FeedbackStep3State extends State<FeedbackStep3> {
                         Text(
                           'Give Feedback',
                           style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
+                              fontFamily: 'Poppins',fontSize: 24, fontWeight: FontWeight.w400,),
                         ),
                       ],
                     ),
@@ -48,75 +48,75 @@ class _FeedbackStep3State extends State<FeedbackStep3> {
             ),
             Center(
               child: Padding(
-                padding: const EdgeInsets.only(top: 40),
-                child: Center(
-                  child: Container(
-                    height: 531,
-                    width: 390,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 9, vertical: 22),
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 223, 218, 218),
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color.fromARGB(255, 0, 0, 0)
-                              .withOpacity(0.16),
-                          offset: const Offset(0, 3),
-                          blurRadius: 6,
-                        ),
-                      ],
-                    ),
-                    child: Center(
-                      child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SvgPicture.asset(
-                              'assets/svg/svg2.svg',
-                              height: 200,
-                              width: 200,
+                padding: const EdgeInsets.only(top: 40,left: 41,right: 35),
+                child: Container(
+               
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 9, vertical: 22),
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 223, 218, 218),
+                    borderRadius: BorderRadius.circular(40),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color.fromARGB(255, 0, 0, 0)
+                            .withOpacity(0.16),
+                        offset: const Offset(0, 3),
+                        blurRadius: 6,
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset(
+                            'assets/svg/svg2.svg',
+                            height: 200,
+                            width: 200,
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          const Center(
+                            child: Text(
+                              'You Got',
+                              style: TextStyle( fontFamily: 'Poppins',fontSize: 24, fontWeight: FontWeight.w400,),
                             ),
-                            const SizedBox(
-                              height: 20,
+                          ),
+                          const Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  '100 ',
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                      fontSize: 24,
+                                      color:
+                                          Color.fromARGB(255, 241, 78, 49)),
+                                ),
+                                Text(
+                                  'Bonus Points',
+                                  style: TextStyle( fontFamily: 'Poppins',fontSize: 24, fontWeight: FontWeight.w400,),
+                                )
+                              ],
                             ),
-                            const Center(
-                              child: Text(
-                                'You Got',
-                                style: TextStyle(fontSize: 24),
-                              ),
+                          ),
+                          const SizedBox(height: 30,),
+                          const Center(
+                            child: Text(
+                              'We really appreciate your helping to improve the experience for everyone',
+                              style: TextStyle( fontFamily: 'Poppins',fontSize: 16, fontWeight: FontWeight.w400,),
+                              textAlign: TextAlign.center,
                             ),
-                            const Center(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    '100 ',
-                                    style: TextStyle(
-                                        fontSize: 24,
-                                        color:
-                                            Color.fromARGB(255, 241, 78, 49)),
-                                  ),
-                                  Text(
-                                    'Bonus Points',
-                                    style: TextStyle(fontSize: 24),
-                                  )
-                                ],
-                              ),
-                            ),
-                            const Center(
-                              child: Text(
-                                'We really appreciate your helping to improve the experience for everyone',
-                                style: TextStyle(fontSize: 18),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ]),
-                    ),
+                          ),
+                        ]),
                   ),
                 ),
               ),
             ),
+            const SizedBox(height: 54,),
             Center(
               child: Padding(
                 padding: const EdgeInsets.only(top: 20),
@@ -135,12 +135,12 @@ class _FeedbackStep3State extends State<FeedbackStep3> {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const HomeScreen(),
+                          builder: (context) => const ProfileScreen(),
                         ),
                       );
                     },
                     child: Text(
-                      'Home',
+                      '100 Points >',
                       style: TextStyle(
                         fontSize: 16,
                         fontFamily: 'Roboto-Regular',
@@ -153,7 +153,7 @@ class _FeedbackStep3State extends State<FeedbackStep3> {
                   ),
                 ),
               ),
-            ),
+            ),  const SizedBox(height: 41,),
           ],
         ),
       ),

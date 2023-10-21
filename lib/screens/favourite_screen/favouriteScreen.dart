@@ -1,10 +1,11 @@
-// ignore_for_file: prefer_interpolation_to_compose_strings, file_names, avoid_print
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:fuelapp/core/utils/image_constant.dart';
 import 'package:fuelapp/firebase/firebase.getFavoritesForuser.dart';
 import 'package:fuelapp/widgets/top_image.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 import 'package:intl/intl.dart';
 
@@ -18,46 +19,71 @@ class Userfav extends StatefulWidget {
 class _UserfavState extends State<Userfav> {
   final GetFavouritesController getFav = Get.put(GetFavouritesController());
   double count = 0;
+  int userPoints = 0; // Add this variable
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch the user's points from Firestore when the widget initializes
+    getUserPoints();
+  }
+
+  Future<void> getUserPoints() async {
+    final userId = GetStorage().read('docId');
+    if (userId != null) {
+      final userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+      final userData = userSnapshot.data();
+      if (userData != null && userData.containsKey('points')) {
+        setState(() {
+          userPoints = userData['points'];
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            children: <Widget>[
-              const TopContainer(),
-              Positioned(
-                top: 70,
-                left: 30,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Row(
-                    children: [
-                      Icon(
-                        Icons.arrow_back_ios,
-                        color: Colors.black,
-                        size: 20,
-                      ),
-                      Text(
-                        'My Favourites',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                    ],
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
+              children: <Widget>[
+                const TopContainer(),
+                Positioned(
+                  top: 70,
+                  left: 30,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Row(
+                      children: [
+                        Icon(
+                          Icons.arrow_back_ios,
+                          color: Colors.black,
+                          size: 20,
+                        ),
+                        Text(
+                          'My Favourites',
+                          style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w400,
+                              fontFamily: 'Poppins'),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          SizedBox(
-            height: 500,
-            child: SingleChildScrollView(
-              child: FutureBuilder<QuerySnapshot>(
-                future: getFav.getuserFav(),
+              ],
+            ),
+            SingleChildScrollView(
+              child: StreamBuilder<QuerySnapshot>(
+                stream: getFav.getuserFav(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const CircularProgressIndicator();
@@ -75,99 +101,96 @@ class _UserfavState extends State<Userfav> {
                           itemBuilder: (context, index) {
                             count += snapshot.data!.docs[index]['points'];
                             print(count);
-                            return Column(
-                              children: [
-                                Container(
-                                  height: 150,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Stack(children: [
-                                    Positioned(
-                                        top: 20,
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 12),
+                              child: Column(
+                                children: [
+                                  Container(
+                                    height: 100,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(40),
+                                      color: Colors.grey.withOpacity(0.2),
+                                    ),
+                                    child: Stack(children: [
+                                      Positioned(
+                                          top: 40,
+                                          left: 20,
+                                          child: Text(
+                                            DateFormat('MM/dd/yyyy').format(
+                                              snapshot.data!
+                                                  .docs[index]['dateCreated']
+                                                  .toDate(),
+                                            ),
+                                            style: const TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.grey),
+                                          )),
+                                      Positioned(
+                                        top: 10,
+                                        right: 20,
+                                        child: IconButton(
+                                          onPressed: () {
+                                            getFav.deleteFav(
+                                                snapshot.data!.docs[index].id);
+                                            Get.snackbar(
+                                                'Success', 'Review Deleted',
+                                                backgroundColor: Colors.green,
+                                                colorText: Colors.white,
+                                                snackPosition:
+                                                    SnackPosition.BOTTOM);
+                                          },
+                                          icon: const Icon(
+                                            Icons.delete,
+                                            color: Colors.red,
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        top: 15,
                                         left: 20,
-                                        child: Text(
-                                          snapshot.data!.docs[index]['name'] +
-                                              " " +
-                                              DateFormat('yyyy-MM-dd').format(
-                                                  snapshot
-                                                      .data!
-                                                      .docs[index]
-                                                          ['dateCreated']
-                                                      .toDate()),
-                                          style: const TextStyle(fontSize: 18),
-                                        )),
-                                    Positioned(
-                                      top: 50,
-                                      left: 15,
-                                      child: RatingBar.builder(
-                                        initialRating: snapshot
-                                            .data!.docs[index]['rating'],
-                                        minRating: 1,
-                                        direction: Axis.horizontal,
-                                        allowHalfRating: true,
-                                        itemCount: 5,
-                                        itemPadding: const EdgeInsets.symmetric(
-                                            horizontal: 4.0),
-                                        itemBuilder: (context, _) => const Icon(
-                                          Icons.star,
-                                          color: Colors.amber,
-                                        ),
-                                        onRatingUpdate: (rating) {
-                                          // Store the rating value
-                                        },
+                                        child: Row(children: [
+                                          Text(
+                                            snapshot.data!.docs[index]
+                                                ['fuelstation'],
+                                            style: const TextStyle(
+                                                fontSize: 16,
+                                                fontFamily: 'Poppins',
+                                                fontWeight: FontWeight.w400,
+                                                color: Colors.grey),
+                                          ),
+                                        ]),
                                       ),
-                                    ),
-                                    Positioned(
-                                      top: 20,
-                                      right: 20,
-                                      child: IconButton(
-                                        onPressed: () {
-                                          getFav.deleteFav(
-                                              snapshot.data!.docs[index].id);
-                                          Get.snackbar(
-                                              'Success', 'Review Deleted',
-                                              backgroundColor: Colors.green,
-                                              colorText: Colors.white,
-                                              snackPosition:
-                                                  SnackPosition.BOTTOM);
-                                        },
-                                        icon: const Icon(Icons.delete),
+                                      Positioned(
+                                        top: 70,
+                                        left: 15,
+                                        child: RatingBar.builder(
+                                          initialRating: snapshot
+                                              .data!.docs[index]['rating'],
+                                          minRating: 1,
+                                          direction: Axis.horizontal,
+                                          allowHalfRating: true,
+                                          itemCount: 5,
+                                          itemSize: 20,
+                                          itemPadding:
+                                              const EdgeInsets.symmetric(
+                                                  horizontal: 4.0),
+                                          itemBuilder: (context, _) =>
+                                              Image.asset(
+                                            ImageConstant.image7,
+                                          ),
+                                          onRatingUpdate: (rating) {
+                                            // Store the rating value
+                                          },
+                                        ),
                                       ),
-                                    ),
-                                    Positioned(
-                                      top: 100,
-                                      left: 20,
-                                      child: Row(children: [
-                                        Text(
-                                          snapshot.data!.docs[index]['email'],
-                                          style: const TextStyle(
-                                              color: Colors.red),
-                                        ),
-                                        const Text('-'),
-                                        Text(snapshot.data!.docs[index]
-                                            ['comment'])
-                                      ]),
-                                    ),
-                                    Positioned(
-                                      top: 150,
-                                      left: 20,
-                                      child: Row(children: [
-                                        Text(
-                                          snapshot.data!.docs[index]['points']
-                                              .toString(),
-                                          style: const TextStyle(
-                                              color: Colors.red),
-                                        ),
-                                        const Text('-'),
-                                        Text(snapshot.data!.docs[index]
-                                            ['comment'])
-                                      ]),
-                                    ),
-                                  ]),
-                                ),
-                                const Divider()
-                              ],
+                                    ]),
+                                  ),
+                                  const SizedBox(
+                                    height: 30,
+                                  )
+                                ],
+                              ),
                             );
                           },
                         ),
@@ -177,40 +200,68 @@ class _UserfavState extends State<Userfav> {
                 },
               ),
             ),
-          ),
-          Center(
-            child: Column(children: [
-              const Text(
-                "You can paid with your points",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.red,
+            const SizedBox(
+              height: 74,
+            ),
+            Center(
+              child: Column(children: [
+                const Text(
+                  "Now You Can Pay With Points",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w400,
+                    color: Colors.red,
+                  ),
                 ),
-              ),
-              const Icon(Icons.assignment_turned_in,
-                  color: Colors.red, size: 50),
-              Text(
-                "Your point - " + count.toString() + ' points',
-                style: const TextStyle(
-                  fontSize: 20,
+                const SizedBox(
+                  height: 17,
                 ),
-              ),
-              const Text(
-                "Point used - 0 points",
-                style: TextStyle(
-                  fontSize: 20,
+                Image.asset(
+                  ImageConstant.image6,
                 ),
-              ),
-              const Text(
-                "Reward balance - 1100 pints",
-                style: TextStyle(
-                  fontSize: 20,
+                const SizedBox(
+                  height: 27,
                 ),
+              ]),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 47),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Your points - " + userPoints.toString() + ' points',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  const Text(
+                    "Points used - 0 points",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  const Text(
+                    "Reward balance - 1100 points",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ],
               ),
-            ]),
-          ),
-        ],
+            ),
+            const SizedBox(
+              height: 23,
+            )
+          ],
+        ),
       ),
     );
   }

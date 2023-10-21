@@ -10,8 +10,9 @@ class UpdateProfile extends GetxController {
   Future<void> updateUserData(
     String profilePicture,
     String firstName,
-    String lastName,
+    String phone,
     String email,
+    String password,
     Function(String) callback,
   ) async {
     try {
@@ -26,11 +27,14 @@ class UpdateProfile extends GetxController {
       if (firstName.isNotEmpty) {
         updateData['firstName'] = firstName;
       }
-      if (lastName.isNotEmpty) {
-        updateData['lastName'] = lastName;
+      if (phone.isNotEmpty) {
+        updateData['phone'] = phone;
       }
       if (email.isNotEmpty) {
         updateData['email'] = email;
+      }
+        if (password.isNotEmpty) {
+        updateData['password'] = password;
       }
 
       if (updateData.isNotEmpty) {

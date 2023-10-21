@@ -1,4 +1,5 @@
 // ignore_for_file: use_build_context_synchronously, avoid_print
+
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -10,6 +11,7 @@ import 'package:fuelapp/widgets/cutomTextfeild.dart';
 import 'package:fuelapp/widgets/top_image.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:get_storage/get_storage.dart';
 
 class EditProfile extends StatefulWidget {
   const EditProfile({super.key});
@@ -29,164 +31,174 @@ class _EditProfileState extends State<EditProfile> {
   late String filePath = '';
   late String fileName = '';
   final UpdateProfile updatePro = Get.put(UpdateProfile());
+  final box = GetStorage();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            children: <Widget>[
-              const TopContainer(),
-              Positioned(
-                top: 70,
-                left: 30,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Row(
-                    children: [
-                      Icon(
-                        Icons.arrow_back_ios,
-                        color: Colors.black,
-                        size: 20,
-                      ),
-                      Text(
-                        'Edit Profile',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Center(
-            child: Stack(
-              children: [
-                SizedBox(
-                  width: 200,
-                  height: 200,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(
-                        100), // Half of the container width or height
-                    child: CachedNetworkImage(
-                      fit: BoxFit.cover,
-                      imageUrl: box.read('profilePicture').toString(),
-                      progressIndicatorBuilder:
-                          (context, url, downloadProgress) =>
-                              CircularProgressIndicator(
-                                  value: downloadProgress.progress),
-                      errorWidget: (context, url, error) =>
-                          const Icon(Icons.error),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
+              children: <Widget>[
+                const TopContainer(),
+                Positioned(
+                  top: 70,
+                  left: 30,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Row(
+                      children: [
+                        Icon(
+                          Icons.arrow_back_ios,
+                          color: Colors.black,
+                          size: 20,
+                        ),
+                        Text(
+                          'Edit Profile',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 24,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-                Positioned(
-                    top: 150,
-                    left: 140,
-                    // ignore: avoid_unnecessary_containers
-                    child: Container(
-                      child: Container(
-                        decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 212, 212, 212),
-                            borderRadius: BorderRadius.circular(50)),
-                        child: IconButton(
-                            onPressed: () async {
-                              final result = await imagePicker.pickImage(
-                                source: ImageSource.gallery,
-                              );
-
-                              if (result != null) {
-                                setState(() {
-                                  filePath = result.path;
-                                  fileName = result.path.split('/').last;
-                                });
-                                uploadFile(filePath, fileName);
-                              }
-                            },
-                            icon: const Icon(Icons.edit)),
-                      ),
-                    ))
               ],
             ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 20, right: 20),
-            child: CustomTextFeild(
-              controller: fnmae,
-              placeholder: "enter first name",
-              titile: "",
-              type: 'text',
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 20, right: 20),
-            child: CustomTextFeild(
-              controller: lname,
-              placeholder: "enter last name",
-              titile: "",
-              type: 'text',
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 20, right: 20),
-            child: CustomTextFeild(
-              controller: email,
-              placeholder: "enter email",
-              titile: "",
-              type: 'text',
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 20, right: 20),
-            child: CustomTextFeild(
-              controller: passwd,
-              placeholder: "enter password",
-              titile: "",
-              type: 'password',
-            ),
-          ),
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 20),
-              child: SizedBox(
-                width: 300,
-                height: 50,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 243, 86, 33),
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6),
+            Center(
+              child: Stack(
+                children: [
+                  SizedBox(
+                    width: 167,
+                    height: 169,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(
+                        100,
+                      ),
+                      child: CachedNetworkImage(
+                        fit: BoxFit.cover,
+                        imageUrl: box.read('profilePicture').toString(),
+                        progressIndicatorBuilder:
+                            (context, url, downloadProgress) =>
+                                CircularProgressIndicator(
+                                    value: downloadProgress.progress),
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error),
+                      ),
                     ),
                   ),
-                  onPressed: () {},
-                  child: Text(
-                    'Update',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'Roboto-Regular',
-                      color: MediaQuery.of(context).platformBrightness ==
-                              Brightness.light
-                          ? Colors.white
-                          : Colors.black,
+                  Positioned(
+                    top: 130,
+                    left: 100,
+                    child: IconButton(
+                      onPressed: () async {
+                        final result = await imagePicker.pickImage(
+                          source: ImageSource.gallery,
+                        );
+
+                        if (result != null) {
+                          setState(() {
+                            filePath = result.path;
+                            fileName = result.path.split('/').last;
+                          });
+                          uploadFile(filePath, fileName);
+                        }
+                      },
+                      icon: const Icon(
+                        Icons.camera_alt,
+                        color: Colors.red,
+                        size: 26,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 20, right: 20),
+              child: CustomTextFeild(
+                controller: fnmae,
+                placeholder: "Your name",
+                titile: "",
+                type: 'text',
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 20, right: 20),
+              child: CustomTextFeild(
+                controller: lname,
+                placeholder: "Your Email",
+                titile: "",
+                type: 'text',
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 20, right: 20),
+              child: CustomTextFeild(
+                controller: email,
+                placeholder: "Phone Number",
+                titile: "",
+                type: 'text',
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 20, right: 20),
+              child: CustomTextFeild(
+                controller: passwd,
+                placeholder: "Password",
+                titile: "",
+                type: 'password',
+              ),
+            ),
+            const SizedBox(
+              height: 66,
+            ),
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: SizedBox(
+                  width: 300,
+                  height: 50,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 243, 86, 33),
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                    onPressed: update,
+                    child: Text(
+                      'Update',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontFamily: 'Poppins',
+                        color: MediaQuery.of(context).platformBrightness ==
+                                Brightness.light
+                            ? Colors.white
+                            : Colors.black,
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+            const SizedBox(
+              height: 46,
+            ),
+          ],
+        ),
       ),
-    ));
+    );
   }
 
   clearParameters() {
@@ -195,10 +207,7 @@ class _EditProfileState extends State<EditProfile> {
     fileName = '';
   }
 
-  Future<void> uploadFile(
-    String filePath,
-    String fileName,
-  ) async {
+  Future<void> uploadFile(String filePath, String fileName) async {
     File file = File(filePath);
     try {
       var uploadimg = await storage.ref('users/$fileName').putFile(file);
@@ -212,9 +221,9 @@ class _EditProfileState extends State<EditProfile> {
     }
   }
 
-  Future update() async {
+  Future<void> update() async {
     await updatePro.updateUserData(
-        imageUrl, fnmae.text, lname.text, email.text, callBack);
+        imageUrl, fnmae.text, lname.text, email.text, passwd.text, callBack);
     clearParameters();
     Navigator.pushReplacement(
       context,
@@ -224,7 +233,7 @@ class _EditProfileState extends State<EditProfile> {
     );
   }
 
-  callBack(String value) {
+  void callBack(String value) {
     if (value == 'success') {
       Get.snackbar('Success', 'Register success',
           backgroundColor: Colors.green,
