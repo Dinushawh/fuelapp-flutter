@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_storage/get_storage.dart';
 
 class UpdateProfile extends GetxController {
@@ -10,14 +11,15 @@ class UpdateProfile extends GetxController {
   Future<void> updateUserData(
     String profilePicture,
     String firstName,
+    String lastName,
     String phone,
-    String email,
-    String password,
+    String newEmail,
+    String newPassword,
     Function(String) callback,
   ) async {
     try {
-      final DocumentReference userRef =
-          FirebaseFirestore.instance.collection('users').doc(box.read('docId'));
+      final String userId = box.read('docId');
+      final FirebaseAuth auth = FirebaseAuth.instance;
 
       final Map<String, dynamic> updateData = {};
 
@@ -25,22 +27,35 @@ class UpdateProfile extends GetxController {
         updateData['profilePicture'] = profilePicture;
       }
       if (firstName.isNotEmpty) {
-        updateData['firstName'] = firstName;
+        updateData['firstname'] = firstName;
+      }
+      if (lastName.isNotEmpty) {
+        updateData['lastname'] = lastName;
       }
       if (phone.isNotEmpty) {
         updateData['phone'] = phone;
       }
-      if (email.isNotEmpty) {
-        updateData['email'] = email;
-      }
-        if (password.isNotEmpty) {
-        updateData['password'] = password;
+
+      final User? user = auth.currentUser;
+      if (user != null) {
+        if (newPassword.isNotEmpty) {
+          await user.updatePassword(newPassword);
+        }
+
+        if (newEmail.isNotEmpty && newEmail != user.email) {
+          await user.sendEmailVerification();
+        }
       }
 
-      if (updateData.isNotEmpty) {
-        await userRef.update(updateData);
-        return callback('success');
+      if (newEmail.isNotEmpty) {
+        updateData['email'] = newEmail;
       }
+
+      final DocumentReference userRef =
+          FirebaseFirestore.instance.collection('users').doc(userId);
+      await userRef.update(updateData);
+
+      return callback('success');
     } catch (e) {
       debugPrint('Error updating user data: $e');
       return callback('error');

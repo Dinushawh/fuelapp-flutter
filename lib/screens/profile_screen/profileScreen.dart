@@ -1,6 +1,7 @@
 // ignore_for_file: file_names, prefer_const_constructors
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:fuelapp/firebase/firebase.updateprofile.dart';
@@ -24,12 +25,23 @@ class ProfileScreen extends StatefulWidget {
 final box = GetStorage();
 
 class _ProfileScreenState extends State<ProfileScreen> {
-    ImagePicker imagePicker = ImagePicker();
+  ImagePicker imagePicker = ImagePicker();
+  final userid = box.read('docId');
   final FirebaseStorage storage = FirebaseStorage.instance;
   late String imageUrl = '';
   late String filePath = '';
   late String fileName = '';
   final UpdateProfile updatePro = Get.put(UpdateProfile());
+
+  Future<DocumentSnapshot> getUserData() async {
+    final DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(box.read('docId'))
+        .get();
+
+    return userSnapshot;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,7 +70,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Text(
                             'Profile',
                             style: TextStyle(
-                                fontFamily: 'Poppins',fontSize: 24, fontWeight: FontWeight.w400,),
+                              fontFamily: 'Poppins',
+                              fontSize: 24,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
                         ],
                       ),
@@ -66,81 +81,139 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ],
               ),
-               Center(
-            child: Stack(
-              children: [
-                SizedBox(
-                  width: 167,
-                  height: 169,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(
-                        100), // Half of the container width or height
-                    child: CachedNetworkImage(
-                      fit: BoxFit.cover,
-                      imageUrl: box.read('profilePicture').toString(),
-                      progressIndicatorBuilder:
-                          (context, url, downloadProgress) =>
-                              CircularProgressIndicator(
-                                  value: downloadProgress.progress),
-                      errorWidget: (context, url, error) =>
-                          const Icon(Icons.error),
-                    ),
-                  ),
-                ),
-                Positioned(
-                    top: 130,
-                    left: 100,
-                    // ignore: avoid_unnecessary_containers
-                    child: IconButton(
-                        onPressed: () async {
-                          final result = await imagePicker.pickImage(
-                            source: ImageSource.gallery,
-                          );
+              FutureBuilder<DocumentSnapshot>(
+                future: getUserData(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else if (!snapshot.hasData || !snapshot.data!.exists) {
+                    return Text('Document does not exist.');
+                  } else {
+                    final data = snapshot.data!.data() as Map<String, dynamic>;
+                    final fname = data['firstname'];
+                    final lname = data['lastname'];
+                    final email = data['email'];
+                    final profilePic = data['profilePicture'];
 
-                          if (result != null) {
-                            setState(() {
-                              filePath = result.path;
-                              fileName = result.path.split('/').last;
-                            });
-                            // uploadFile(filePath, fileName);
-                          }
-                        },
-                        icon: const Icon(Icons.edit_square,color: Colors.red,size: 26,)))
-              ],
-            ),
-          ),
-              // Center(
-              //   child: SizedBox(
-              //     width: 169,
-              //     height: 167,
-              //     child: ClipRRect(
-              //       borderRadius: BorderRadius.circular(100),
-              //       child: CachedNetworkImage(
-              //         fit: BoxFit.cover,
-              //         imageUrl: box.read('profilePicture').toString(),
-              //         progressIndicatorBuilder:
-              //             (context, url, downloadProgress) =>
-              //                 CircularProgressIndicator(
-              //                     value: downloadProgress.progress),
-              //         errorWidget: (context, url, error) => Icon(Icons.error),
-              //       ),
-              //     ),
-              //   ),
-              // ),
-              SizedBox(height: 32,),
-              Center(
-                child: Column(children: [
-                  Text(
-                    "${box.read('fname')} ${box.read('lanme')}",
-                    style: TextStyle( fontFamily: 'Poppins',fontSize: 32, fontWeight: FontWeight.w400,),
-                  ),
-                  Text(
-                    box.read('email').toString(),
-                    style: TextStyle( fontFamily: 'Poppins',fontSize: 16, fontWeight: FontWeight.w400,),
-                  )
-                ]),
+                    return Column(
+                      children: [
+                        Center(
+                          child: Stack(
+                            children: [
+                              SizedBox(
+                                width: 167,
+                                height: 169,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(
+                                      100), // Half of the container width or height
+                                  child: CachedNetworkImage(
+                                    fit: BoxFit.cover,
+                                    imageUrl: profilePic,
+                                    progressIndicatorBuilder: (context, url,
+                                            downloadProgress) =>
+                                        CircularProgressIndicator(
+                                            value: downloadProgress.progress),
+                                    errorWidget: (context, url, error) =>
+                                        const Icon(Icons.error),
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                  top: 130,
+                                  left: 100,
+                                  // ignore: avoid_unnecessary_containers
+                                  child: IconButton(
+                                      onPressed: () async {
+                                        final result =
+                                            await imagePicker.pickImage(
+                                          source: ImageSource.gallery,
+                                        );
+
+                                        if (result != null) {
+                                          setState(() {
+                                            filePath = result.path;
+                                            fileName =
+                                                result.path.split('/').last;
+                                          });
+                                        }
+                                      },
+                                      icon: const Icon(
+                                        Icons.edit_square,
+                                        color: Colors.red,
+                                        size: 26,
+                                      )))
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 32,
+                        ),
+                        Center(
+                          child: Column(children: [
+                            Text(
+                              "$fname $lname",
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 32,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                            Text(
+                              email,
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            )
+                          ]),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        // Text('Name: $name'),
+                        // Text('Email: $email'),
+                      ],
+                    );
+                  }
+                },
               ),
-              SizedBox(height: 20,),
+              // StreamBuilder<DocumentSnapshot>(
+              //   stream: FirebaseFirestore.instance
+              //       .collection('users')
+              //       .doc(userid)
+              //       .snapshots(),
+              //   builder: (context, snapshot) {
+              //     switch (snapshot.connectionState) {
+              //       case ConnectionState.waiting:
+              //         return CircularProgressIndicator();
+              //       case ConnectionState
+              //             .active: // Use ConnectionState.active for Firestore snapshots
+              //         if (snapshot.hasError) {
+              //           return Text('Error: ${snapshot.error}');
+              //         }
+              //         if (!snapshot.hasData || !snapshot.data!.exists) {
+              //           return Text('Document does not exist.');
+              //         }
+
+              //         var data = snapshot.data;
+              //         if (kDebugMode) {
+              //           print(data.toString());
+              //         }
+
+              //         return Column(
+              //           children: [
+              //             Text('Name: ${snapshot.data?['name']}'),
+              //           ],
+              //         );
+              //       default:
+              //         return Text('Unexpected connection state.');
+              //     }
+              //   },
+              // ),
+
               Center(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -164,7 +237,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       'Edit Profile',
                       style: TextStyle(
                         fontSize: 20,
-                       fontFamily: "Poppins",
+                        fontFamily: "Poppins",
                         color: MediaQuery.of(context).platformBrightness ==
                                 Brightness.light
                             ? Colors.white
@@ -178,7 +251,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 height: 30,
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 56,right: 44),
+                padding: const EdgeInsets.only(left: 56, right: 44),
                 child: Column(children: [
                   GestureDetector(
                       onTap: () {
@@ -194,8 +267,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         children: [
                           Text(
                             "Give feedback",
-                            style: TextStyle( fontSize: 20,
-                         fontFamily: "Poppins",fontWeight: FontWeight.w400),
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontFamily: "Poppins",
+                                fontWeight: FontWeight.w400),
                           ),
                           Padding(
                             padding: EdgeInsets.only(left: 10),
@@ -221,8 +296,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         children: [
                           Text(
                             "My favourite",
-                            style: TextStyle( fontSize: 20,
-                         fontFamily: "Poppins",fontWeight: FontWeight.w400),
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontFamily: "Poppins",
+                                fontWeight: FontWeight.w400),
                           ),
                           Padding(
                             padding: EdgeInsets.only(left: 10),
@@ -235,31 +312,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       )),
                   const SizedBox(height: 10),
                   GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const RecomondationScreen(),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const RecomondationScreen(),
+                        ),
+                      );
+                    },
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Recommendations",
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontFamily: "Poppins",
+                              fontWeight: FontWeight.w400),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(left: 10),
+                          child: Icon(
+                            Icons.arrow_forward_ios,
+                            size: 18,
                           ),
-                        );
-                      },
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Recommendations",
-                            style: TextStyle( fontSize: 20,
-                         fontFamily: "Poppins",fontWeight: FontWeight.w400),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(left: 10),
-                            child: Icon(
-                              Icons.arrow_forward_ios,
-                              size: 18,
-                            ),
-                          ),
-                        ],
-                      ),),
+                        ),
+                      ],
+                    ),
+                  ),
                   const SizedBox(height: 25),
                   const Divider(),
                   const SizedBox(height: 19),
@@ -268,19 +348,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       Text(
                         "My fuel map",
-                        style: TextStyle( fontSize: 20,
-                         fontFamily: "Poppins",fontWeight: FontWeight.w400),
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontFamily: "Poppins",
+                            fontWeight: FontWeight.w400),
                       ),
-                       Padding(
-                            padding: EdgeInsets.only(left: 10),
-                            child: Icon(
-                              Icons.arrow_forward_ios,
-                              size: 18,
-                            ),
-                          ),
+                      Padding(
+                        padding: EdgeInsets.only(left: 10),
+                        child: Icon(
+                          Icons.arrow_forward_ios,
+                          size: 18,
+                        ),
+                      ),
                     ],
                   ),
-                  SizedBox(height: 9,),
+                  SizedBox(
+                    height: 9,
+                  ),
                   GestureDetector(
                       onTap: () {},
                       child: const Row(
@@ -288,7 +372,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         children: [
                           Text(
                             "Logout",
-                            style: TextStyle(fontSize: 18,color: Color.fromARGB(255, 234, 73, 15),),
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Color.fromARGB(255, 234, 73, 15),
+                            ),
                           ),
                         ],
                       )),

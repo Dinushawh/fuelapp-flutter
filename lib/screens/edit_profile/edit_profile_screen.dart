@@ -3,6 +3,7 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:fuelapp/firebase/firebase.updateprofile.dart';
@@ -23,15 +24,46 @@ class EditProfile extends StatefulWidget {
 class _EditProfileState extends State<EditProfile> {
   TextEditingController fnmae = TextEditingController();
   TextEditingController lname = TextEditingController();
+  TextEditingController phone = TextEditingController();
   TextEditingController email = TextEditingController();
   TextEditingController passwd = TextEditingController();
   ImagePicker imagePicker = ImagePicker();
+
   final FirebaseStorage storage = FirebaseStorage.instance;
   late String imageUrl = '';
   late String filePath = '';
   late String fileName = '';
   final UpdateProfile updatePro = Get.put(UpdateProfile());
   final box = GetStorage();
+  bool isloading = false;
+  @override
+  void initState() {
+    super.initState();
+    loadUserData();
+  }
+
+  void loadUserData() async {
+    final userid = box.read('docId');
+    setState(() {
+      isloading = true;
+    });
+
+    final userDoc =
+        await FirebaseFirestore.instance.collection('users').doc(userid).get();
+
+    if (userDoc.exists) {
+      final userData = userDoc.data();
+
+      fnmae.text = userData?['firstname'] ?? '';
+      lname.text = userData?['lastname'] ?? '';
+      email.text = userData?['email'] ?? '';
+      phone.text = userData?['phone'] ?? '';
+      imageUrl = userData?['profilePicture'] ?? '';
+      setState(() {
+        isloading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,55 +103,57 @@ class _EditProfileState extends State<EditProfile> {
                 ),
               ],
             ),
-            Center(
-              child: Stack(
-                children: [
-                  SizedBox(
-                    width: 167,
-                    height: 169,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(
-                        100,
-                      ),
-                      child: CachedNetworkImage(
-                        fit: BoxFit.cover,
-                        imageUrl: box.read('profilePicture').toString(),
-                        progressIndicatorBuilder:
-                            (context, url, downloadProgress) =>
-                                CircularProgressIndicator(
-                                    value: downloadProgress.progress),
-                        errorWidget: (context, url, error) =>
-                            const Icon(Icons.error),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    top: 130,
-                    left: 100,
-                    child: IconButton(
-                      onPressed: () async {
-                        final result = await imagePicker.pickImage(
-                          source: ImageSource.gallery,
-                        );
+            isloading == true
+                ? const CircularProgressIndicator()
+                : Center(
+                    child: Stack(
+                      children: [
+                        SizedBox(
+                          width: 167,
+                          height: 169,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(
+                              100,
+                            ),
+                            child: CachedNetworkImage(
+                              fit: BoxFit.cover,
+                              imageUrl: imageUrl,
+                              progressIndicatorBuilder:
+                                  (context, url, downloadProgress) =>
+                                      CircularProgressIndicator(
+                                          value: downloadProgress.progress),
+                              errorWidget: (context, url, error) =>
+                                  const Icon(Icons.error),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          top: 130,
+                          left: 100,
+                          child: IconButton(
+                            onPressed: () async {
+                              final result = await imagePicker.pickImage(
+                                source: ImageSource.gallery,
+                              );
 
-                        if (result != null) {
-                          setState(() {
-                            filePath = result.path;
-                            fileName = result.path.split('/').last;
-                          });
-                          uploadFile(filePath, fileName);
-                        }
-                      },
-                      icon: const Icon(
-                        Icons.camera_alt,
-                        color: Colors.red,
-                        size: 26,
-                      ),
+                              if (result != null) {
+                                setState(() {
+                                  filePath = result.path;
+                                  fileName = result.path.split('/').last;
+                                });
+                                uploadFile(filePath, fileName);
+                              }
+                            },
+                            icon: const Icon(
+                              Icons.camera_alt,
+                              color: Colors.red,
+                              size: 26,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
             const SizedBox(
               height: 20,
             ),
@@ -136,7 +170,7 @@ class _EditProfileState extends State<EditProfile> {
               padding: const EdgeInsets.only(left: 20, right: 20),
               child: CustomTextFeild(
                 controller: lname,
-                placeholder: "Your Email",
+                placeholder: "Your lastname",
                 titile: "",
                 type: 'text',
               ),
@@ -145,9 +179,18 @@ class _EditProfileState extends State<EditProfile> {
               padding: const EdgeInsets.only(left: 20, right: 20),
               child: CustomTextFeild(
                 controller: email,
-                placeholder: "Phone Number",
+                placeholder: "Your Email",
                 titile: "",
                 type: 'text',
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 20, right: 20),
+              child: CustomTextFeild(
+                controller: phone,
+                placeholder: "Phone Number",
+                titile: "",
+                type: 'number',
               ),
             ),
             Padding(
@@ -160,7 +203,7 @@ class _EditProfileState extends State<EditProfile> {
               ),
             ),
             const SizedBox(
-              height: 66,
+              height: 20,
             ),
             Center(
               child: Padding(
@@ -222,8 +265,8 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   Future<void> update() async {
-    await updatePro.updateUserData(
-        imageUrl, fnmae.text, lname.text, email.text, passwd.text, callBack);
+    await updatePro.updateUserData(imageUrl, fnmae.text, lname.text, phone.text,
+        email.text, passwd.text, callBack);
     clearParameters();
     Navigator.pushReplacement(
       context,

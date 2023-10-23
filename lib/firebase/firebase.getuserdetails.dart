@@ -7,7 +7,7 @@ class GetUserDetails extends GetxController {
   final box = GetStorage();
 
   Stream<QuerySnapshot> getCartdetails() {
-    Query query = FirebaseFirestore.instance.collection('cart');
+    Query query = FirebaseFirestore.instance.collection('users');
     query = query.where(
       'email',
       isEqualTo: box.read('email'),
